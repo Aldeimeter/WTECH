@@ -3,5 +3,5 @@ https://www.figma.com/file/z4aLKnfBvctzZRocRW4WUE/WTECH?type=design&node-id=0%3A
 
 ## TO-DO:
 - [x] Categories
-- [ ] Cart
+- [x] Cart
 - [ ] Login

@@ -44,8 +44,8 @@
     </header>
     <main><br /><br /><br />
         <div class="container">
-            <div class="row">
-                <div class="col col-md-3">
+            <div class="row col-12">
+                <div class="col col-12 col-lg-3 col-md-4 ">
                     <div class="row">
                         <div class="col">
                             <div class="card align-items-center">
@@ -64,7 +64,6 @@
                                             </li>
                                             <li class="page-item"><a class="page-link" href="#">3</a></li>
                                             <li class="page-item"><a class="page-link" href="#">4</a></li>
-                                            <li class="page-item"><a class="page-link" href="#">5</a></li>
                                             <li class="page-item">
                                                 <a class="page-link" href="#" aria-label="Next">
                                                     <span aria-hidden="true">»</span>
@@ -74,7 +73,7 @@
                                     </nav>
                                 </div>
                             </div>
-                            <div class="card mt-5">
+                            <div class="card mt-5 mb-5">
                                 <div class="card-body">
                                     <form>
                                         <labal for="address" class="form-label">Adresa</labal>
@@ -108,32 +107,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="col col-md-9">
+                <div class="col col-md-8">
                     <div class="row">
                         <div class="col">
                             <div class="card">
                                 <div class="row">
-                                    <div class="col-4">
-                                        <img src="../img/sample.jpg" alt="..." class="card-img-left">
+                                    <div class="d-none d-sm-block col-3 " style="background-image: url(../img/sample.jpg); background-position-x:center;">
                                     </div>
-                                    <div class="col d-flex flex-column align-items-center">
-                                        <div class="card-body text-center">
-                                            <h4 class="card-title text-center">Autor - kniha</h4>
-                                        </div>
-                                        <div>
-                                            <ul class="list-group list-group-horizontal ">
-                                                <li class="list-group-item">
-                                                    <h5>Cena</h5>
+                                    <div class="col-9 d-flex ">
+                                        <div class="card-body flex-column">
+                                            <h4 class="card-title mt-2">Autor - kniha</h4>
+                                            <ul class="list-group list-group-horizontal mt-4" style="width:inherit">
+                                                <li style="display:flex; flex-direction: column;"
+                                                    class="list-group-item justify-content-center">
+                                                    <p class="mb-0">Cena</p>
                                                 </li>
-                                                <li class="list-group-item">
+                                                <li class="list-group-item justify-content-center"
+                                                    style="display:flex; flex-direction: column;">
                                                     <div class="btn-group">
                                                         <button class="btn btn-secondary">-</button>
                                                         <button class="btn btn-secondary">2</button>
                                                         <button class="btn btn-secondary">+</button>
                                                     </div>
                                                 </li>
-                                                <li class="list-group-item">
-                                                    <h5>Celková cena</h5>
+                                                <li style="display:flex; flex-direction: column;"
+                                                    class="list-group-item justify-content-center">
+                                                    <p class="mb-0">Celková cena</p>
                                                 </li>
                                             </ul>
                                         </div>
