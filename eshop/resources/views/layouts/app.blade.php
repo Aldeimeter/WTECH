@@ -31,6 +31,20 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
 
+                        <form action={{route('books.search')}} method="GET">
+                          <div class="form-group row">
+                            <div class="col-8">
+                              <input type="search" name="search" class="form-control text-center text-md-start"  placeholder="Hľadajte tu">
+                            </div>
+                            <div class="col-4">
+                              <button type="submit" class="form-control btn btn-outline-success">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                                  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                                </svg>
+                              </button>
+                            </div>
+                          </div>
+                        </form>
                           <li class="navbar-item ">
                             <div class="dropdown">
 

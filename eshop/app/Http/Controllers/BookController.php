@@ -37,7 +37,12 @@ class BookController extends Controller
         $results = $query->paginate(2);
         return view('books', compact('results','genre'));
     }
-
+    public function search(Request $request)
+    {
+        echo $request->search;
+        $books = Book::whereRaw("search_vector @@ plainto_tsquery('simple', ?)", [$request->search])->get();
+        echo $books;
+    }
     /**
      * Show the form for creating a new resource.
      */

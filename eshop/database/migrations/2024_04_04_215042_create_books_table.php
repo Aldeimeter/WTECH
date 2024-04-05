@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -21,7 +22,14 @@ return new class extends Migration
             $table->text('description') -> nullable();
             $table->timestamps();
         });
+   // Add the tsvector column with raw SQL
+        DB::statement('ALTER TABLE books ADD COLUMN search_vector tsvector');
 
+        // Update the tsvector column with concatenated name and description for existing records
+        DB::statement("UPDATE books SET search_vector = to_tsvector('simple', coalesce(name, '') || ' ' || coalesce(description, ''))");
+
+        // Create a GIN index on the tsvector column for performance
+        DB::statement('CREATE INDEX search_vector_gin ON books USING GIN(search_vector)');
         Schema::create('authors', function (Blueprint $table) {
             $table->id();
             $table->string('fullname', 48);
@@ -65,6 +73,13 @@ return new class extends Migration
         Schema::dropIfExists('authors');
         Schema::dropIfExists('images');
         Schema::dropIfExists('genres');
+        Schema::table('books', function (Blueprint $table) {
+            // Remove the GIN index
+            $table->dropIndex(['search_vector_gin']);
+
+            // Remove the tsvector column
+            $table->dropColumn('search_vector');
+        });
         Schema::dropIfExists('books');
     }
 };
