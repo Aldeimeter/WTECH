@@ -31,6 +31,13 @@
                     <!-- Left Side Of Navbar -->
                     <ul class="navbar-nav me-auto">
 
+                          <li class="navbar-item ">
+                            <div class="dropdown">
+
+                              <a class="nav-link btn dropdown-toggle text-start" role="button" data-bs-toggle="dropdown" aria-expanded="false">{{__('Žánre')}}</a>
+                              <ul class="dropdown-menu">
+                                @include('layouts.partials.genresMenu')
+                            </ul>
                     </ul>
 
                     <!-- Right Side Of Navbar -->

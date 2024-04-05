@@ -2,22 +2,30 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-
+use App\Models\Genre;
+use App\Models\Book;
+use Illuminate\Support\Str;
 class DatabaseSeeder extends Seeder
 {
     /**
-     * Seed the application's database.
+     * Run the database seeds.
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $genres = [
+            'Crime','Fantasy','Horror','Non-Fiction','Fiction'
+        ];
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        foreach ($genres as $genre) {
+            Genre::create(['name'=> $genre, 'slug'=>Str::slug($genre,'-')]);
+        }
+
+        $fictionGenre = Genre::where('slug','fiction')->firstOrFail();
+
+        Book::factory(5)->create()->each(function ($book) use ($fictionGenre){
+            $book->genres()->attach($fictionGenre);
+        });
     }
 }
