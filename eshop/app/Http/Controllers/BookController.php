@@ -43,6 +43,13 @@ class BookController extends Controller
         $books = Book::whereRaw("search_vector @@ plainto_tsquery('simple', ?)", [$request->search])->get();
         echo $books;
     }
+
+    public function book(Request $request, $idslug){
+        $query = Book::query()->where("id", "=", $idslug);
+        $results = $query->get();
+        return view("book", compact("results"));
+
+    }
     /**
      * Show the form for creating a new resource.
      */
