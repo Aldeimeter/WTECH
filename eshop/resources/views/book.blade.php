@@ -40,24 +40,19 @@
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
                             <span>Cena: {{$results[0]->price}}$</span>
                             <div class="input-group">
-                                <button id="decrement" class="btn" onclick="
-                                    if(document.querySelector('#input').value > 1)
-                                    {
-                                        document.querySelector('#input').value--;
-                                        document.querySelector('#sum').textContent = 'Suma: ' + ({{$results[0]->price}} * document.querySelector('#input').value).toFixed(2) + '$';
-                                    }
-                                ">-</button>
-                                <input type="number" id="input" value="1" class="form-control" readonly>
-                                <button id="increment" class="btn" onclick="
-                                    document.querySelector('#input').value++;
-                                    document.querySelector('#sum').textContent = 'Suma: ' + ({{$results[0]->price}} * document.querySelector('#input').value).toFixed(2) + '$';
-                                ">+</button>
+                                @if($amount > 1)
+                                <a id="decrement" class="btn" href="{{route('books.book', ['id' => $results[0]->id, 'amount' => ($amount - 1)])}}">-</a>
+                                @else
+                                <a id="decrement" class="btn" href="">-</a>
+                                @endif
+                                <input type="number" id="input" value="{{$amount}}" class="form-control" readonly>
+                                <a id="increment" class="btn" href="{{route('books.book', ['id' => $results[0]->id, 'amount' => ($amount + 1)])}}">+</a>
                             </div>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
                             <span id="sum">Suma: {{$results[0]->price}}$</span><br>
                             <a href="cart.html" role="button" class="btn btn-lg btn-success">Kupit</a>
-                            <a href="#" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
+                            <a href="{{ route('cart.create', ['bookid' => $results[0]->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
                         </div>
                     </div>
                 </div>

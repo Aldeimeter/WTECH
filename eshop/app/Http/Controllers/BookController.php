@@ -55,7 +55,11 @@ class BookController extends Controller
         ->select("books.*", "authors.fullname", "genres.name as genre_name")
         ->where("books.id", "=", $idslug);
         $results = $query->get();
-        return view("book", compact("results"));
+        $amount = $request->input("amount");
+        if(is_null($amount) || $amount < 1){
+            $amount = 1;
+        }
+        return view("book", compact("results", "amount"));
 
     }
     /**

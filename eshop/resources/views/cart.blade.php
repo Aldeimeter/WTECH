@@ -152,4 +152,5 @@
         </div>
     </div>
 </main>
+{{$cartitems}}
 @endsection

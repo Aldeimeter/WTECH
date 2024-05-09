@@ -27,11 +27,14 @@ class CartItemController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        return CartItem::create([
-
-        ]);
+        $cartitem = new CartItem();
+        $cartitem->bookid = $request->input("bookid");
+        $cartitem->userid = Auth::id();
+        $cartitem->amount = $request->input("amount");
+        $cartitem->save();
+        return redirect("/cart");
     }
 
     /**

@@ -10,6 +10,9 @@ class CartItem extends Model
 {
     use HasFactory;
 
+    protected $guarded = ["id"];
+    protected $fillable = ["bookid", "userid", "amount"];
+
     public function books(): HasOne {
         return $this->hasOne(Book::class, "books");
     }
