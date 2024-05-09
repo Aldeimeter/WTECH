@@ -8,7 +8,7 @@
         </div>
     </div>
     <div class="card">
-        <h3 class="card-header">Nazov Knihy</h3>
+        <h3 class="card-header">{{$results[0]->name}}</h3>
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-lg-4">
@@ -66,6 +66,5 @@
             </div>
         </div>
     </div>
-{{$results}}
 </main>
 @endsection
