@@ -40,13 +40,22 @@
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
                             <span>Cena: {{$results[0]->price}}$</span>
                             <div class="input-group">
-                                <button id="decrement" class="btn">-</button>
-                                <input type="number" id="input" value="0" class="form-control" readonly>
-                                <button id="increment" class="btn">+</button>
+                                <button id="decrement" class="btn" onclick="
+                                    if(document.querySelector('#input').value > 1)
+                                    {
+                                        document.querySelector('#input').value--;
+                                        document.querySelector('#sum').textContent = 'Suma: ' + ({{$results[0]->price}} * document.querySelector('#input').value).toFixed(2) + '$';
+                                    }
+                                ">-</button>
+                                <input type="number" id="input" value="1" class="form-control" readonly>
+                                <button id="increment" class="btn" onclick="
+                                    document.querySelector('#input').value++;
+                                    document.querySelector('#sum').textContent = 'Suma: ' + ({{$results[0]->price}} * document.querySelector('#input').value).toFixed(2) + '$';
+                                ">+</button>
                             </div>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
-                            <span>Suma: 0</span><br>
+                            <span id="sum">Suma: {{$results[0]->price}}$</span><br>
                             <a href="cart.html" role="button" class="btn btn-lg btn-success">Kupit</a>
                             <a href="#" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
                         </div>
@@ -67,4 +76,5 @@
         </div>
     </div>
 </main>
+
 @endsection
