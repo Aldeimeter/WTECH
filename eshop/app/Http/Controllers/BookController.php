@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
+use Illuminate\Support\Facades\DB;
+
 class BookController extends Controller
 {
     /**
@@ -45,7 +47,13 @@ class BookController extends Controller
     }
 
     public function book(Request $request, $idslug){
-        $query = Book::query()->where("id", "=", $idslug);
+        $query = DB::table("books")
+        ->join("authors_books", "authors_books.book_id", "=", "books.id")
+        ->join("authors", "authors_books.author_id", "=", "authors.id")
+        ->join("genres_books", "books.id", "=", "genres_books.book_id")
+        ->join("genres", "genres.id", "=", "genres_books.genre_id")
+        ->select("books.*", "authors.fullname", "genres.name as genre_name")
+        ->where("books.id", "=", $idslug);
         $results = $query->get();
         return view("book", compact("results"));
 

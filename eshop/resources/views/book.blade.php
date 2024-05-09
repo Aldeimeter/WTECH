@@ -35,10 +35,10 @@
                     <div class="row border rounded-5 p-3 mt-3 mt-lg-0">
                         <div class="col-12">
                             <h5>Opis</h5>
-                            <p>Příběh o vesmírném hvězdoletu Prométheus a jeho odvážné posádce, která pomůže osvobodit Zemi od nadvlády robotů, se v hlavě Václava Šorela začal rodit v sedmdesátých letech 20. století. Ve spolupráci s ilustrátorem Františkem Kobíkem pak vznikl komiks Vzpoura mozků, jenž se stal doslova kultem. Po více než čtyřiceti letech vyšel tento komiks v románové podobě, následně vznikla dramatizace v Českém rozhlase a nyní vychází toto kultovní dílo jako audiokniha v interpretaci Aleše Procházky.</p>
+                            <p>{{$results[0]->description}}</p>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
-                            <span>Cena: 15$</span>
+                            <span>Cena: {{$results[0]->price}}$</span>
                             <div class="input-group">
                                 <button id="decrement" class="btn">-</button>
                                 <input type="number" id="input" value="0" class="form-control" readonly>
@@ -56,15 +56,16 @@
         </div>
         <div class="card-footer row mx-0">
             <div class="col-4">
-                Autor: Václav Šorel
+                Autor: {{$results[0]->fullname}}
             </div>
             <div class="col-4">
-                Jazyk: Česky
+                Jazyk: {{$results[0]->language}}
             </div>
             <div class="col-4">
-                Žánre: Fantasy a sci-fi, Česká literatúra
+                Žánre: {{$results[0]->genre_name}}
             </div>
         </div>
     </div>
+{{$results}}
 </main>
 @endsection
