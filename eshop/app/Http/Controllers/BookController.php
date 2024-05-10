@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Author;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
+use App\Models\Image;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
@@ -62,12 +64,63 @@ class BookController extends Controller
         return view("book", compact("results", "amount"));
 
     }
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+    public function admin()
     {
-        //
+        $genres = DB::table("genres")->select("slug", "name")->get();
+        return view("admin", compact("genres"));
+    }
+
+    public function create(Request $request)
+    {
+        $book = new Book();
+        $book->name = $request->input("book-name");
+        $book->slug = $this->slugify($book->name);
+        $book->price = (float)$request->input("price");
+        $book->language = $request->input("language");
+        $book->publish_date = $request->input("date");
+        $book->description = $request->input("description");
+        $book->save();
+        if(DB::table("authors")
+        ->where("fullname", "=", $request->input("author"))
+        ->count("id") === 0){
+            $author = new Author();
+            $author->fullname = $request->input("author");
+            $author->save();
+        }
+        $authorid = DB::table("authors")
+        ->where("fullname", "=", $request->input("author"))
+        ->select("id")
+        ->first();
+        $book->authors()->attach($authorid);
+        foreach($request->input("genres") as $g){
+            $gid = DB::table("genres")
+            ->where("slug", "=", $g)
+            ->select("id")
+            ->first();
+            $book->genres()->attach($gid);
+        }
+        $images = $request->file('images');
+        $imagepaths = array();
+        if($request->hasFile("images")){
+            foreach($images as $img){
+                $prefix = date_format(now(), "YmdHis");
+                $imagename = $prefix . $img->getClientOriginalName();
+                $img->move(base_path(). "/resources/img/", $imagename);
+                $imagepaths[] = $imagename;
+            }
+        }
+        foreach($imagepaths as $imgname){
+            if(is_null(Image::query()->find($imgname))){
+                continue;
+            }
+            $img = new Image();
+            $img->id = $imgname;
+            $img->book_id = $book->id;
+            $img->alt_text = $book->name;
+            $img->save;
+        }
+        return redirect("/books/" . $book->id);
     }
 
     /**
@@ -108,5 +161,27 @@ class BookController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    private function slugify($text) { //https://lucidar.me/en/web-dev/how-to-slugify-a-string-in-php/
+        // Strip html tags
+        $text=strip_tags($text);
+        // Replace non letter or digits by -
+        $text = preg_replace('~[^\pL\d]+~u', '-', $text);
+        // Transliterate
+        setlocale(LC_ALL, 'en_US.utf8');
+        $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+        // Remove unwanted characters
+        $text = preg_replace('~[^-\w]+~', '', $text);
+        // Trim
+        $text = trim($text, '-');
+        // Remove duplicate -
+        $text = preg_replace('~-+~', '-', $text);
+        // Lowercase
+        $text = strtolower($text);
+        // Check if it is empty
+        if (empty($text)) { return 'n-a'; }
+        // Return result
+        return $text;
     }
 }
