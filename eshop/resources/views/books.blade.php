@@ -58,7 +58,7 @@
                         <!-- Image placeholder or dynamic image -->
                     </div>
                     <div class="col-md-8">
-                        <h5 class="card-header">{{ $book->name }}</h5>
+                        <h5 class="card-header"><a href="/books/{{$book->id}}">{{ $book->name }}</a></h5>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-8">

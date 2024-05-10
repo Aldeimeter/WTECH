@@ -50,9 +50,14 @@
                             </div>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
-                            <span id="sum">Suma: {{$results[0]->price}}$</span><br>
-                            <a href="cart.html" role="button" class="btn btn-lg btn-success">Kupit</a>
+                            <span id="sum">Suma: {{$results[0]->price * $amount}}$</span><br>
+                            @if(Auth::check())
+                            <a href="{{ route('cart.create', ['bookid' => $results[0]->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-success">Kupit</a>
                             <a href="{{ route('cart.create', ['bookid' => $results[0]->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
+                            @else
+                            <a href="#" role="button" class="btn btn-lg btn-secondary">Kupit</a>
+                            <a href="#" role="button" class="btn btn-lg btn-outline-secondary">Pridat do košíka</a>
+                            @endif
                         </div>
                     </div>
                 </div>

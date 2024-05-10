@@ -35,7 +35,11 @@
                                     </label>
                                     <input type="text" id="cost" readonly value="{{$total}}$" class="form-control form-control-plaintext">
                                     <div class="row justify-content-center">
+                                        @if(Auth::check())
                                         <button class="btn btn-primary btn-lg mt-3">Kúpiť</button>
+                                        @else
+                                        <button class="btn btn-secondary btn-lg mt-3" disabled>Kúpiť</button>
+                                        @endif
                                     </div>
                                 </form>
                             </div>
@@ -53,7 +57,7 @@
                                 </div>
                                 <div class="col-9 d-flex ">
                                     <div class="card-body flex-column">
-                                        <h4 class="card-title mt-2">{{$book->fullname}} - {{$book->name}}</h4>
+                                        <h4 class="card-title mt-2"><a href="books/{{$book->id}}">{{$book->fullname}} - {{$book->name}}</a></h4>
                                         <ul class="list-group list-group-horizontal mt-4" style="width:inherit">
                                             <li style="display:flex; flex-direction: column;" class="list-group-item justify-content-center">
                                                 <p class="mb-0">{{$book->price}}$</p>
@@ -82,7 +86,11 @@
                             </div>
                         </div>
                         @empty
+                            @if(Auth::check())
                             <p>Nemáte nič v košiku</p>
+                            @else
+                            <p>Nie ste prihlásení</p>
+                            @endif
                         @endforelse
                         {{$cartitems->links('vendor.pagination.bootstrap-5')}}
                     </div>
