@@ -236,7 +236,18 @@ class BookController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        DB::table("cart_items")
+        ->where("bookid", "=", $id)->delete();
+        DB::table("order_items")
+        ->where("bookid", "=", $id)->delete();
+        DB::table("genres_books")
+        ->where("book_id", "=", $id)->delete();
+        DB::table("authors_books")
+        ->where("book_id", "=", $id)->delete();
+        DB::table("images")
+        ->where("book_id", "=", $id)->delete();
+        Book::query()->find($id)->delete();
+        return redirect("/");
     }
 
     private function slugify($text) { //https://lucidar.me/en/web-dev/how-to-slugify-a-string-in-php/

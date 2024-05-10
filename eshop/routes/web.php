@@ -13,6 +13,7 @@ Route::get('/books/genre/{Genre}', [App\Http\Controllers\BookController::class, 
 Route::get('/books/show/{id}', [App\Http\Controllers\BookController::class, 'show'])->name('books.show');
 Route::post('/books/create', [App\Http\Controllers\BookController::class, 'create'])->name('books.create');
 Route::put('/books/update/{id}', [App\Http\Controllers\BookController::class, 'update'])->name('books.update');
+Route::put('/books/delete/{id}', [App\Http\Controllers\BookController::class, 'destroy'])->name('books.destroy');
 Route::get('/books/admin', [App\Http\Controllers\BookController::class, 'admin'])->name('books.admin');
 Route::get('/search', [App\Http\Controllers\BookController::class, 'search'])->name('books.search');
 Route::resource('/cart', App\Http\Controllers\CartItemController::class);

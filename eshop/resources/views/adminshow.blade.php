@@ -45,6 +45,7 @@
                 <input accept=".jpeg,.jpg,.png" class="btw btn-primary" type="file" name="images[]" multiple>
             </div>
             <button type="submit" class="btn btn-success">Uložiť</button>
+            <button type="submit" class="btn btn-danger" formaction="/books/delete/{{$book->id}}">Vymazať</button>
         </form>
     </div>
 </main>
