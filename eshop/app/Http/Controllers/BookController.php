@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Image;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
@@ -134,9 +135,31 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Request $request, string $id)
     {
-        //
+        $book = Book::query()->find($id)->select("*")->first();
+        $author = DB::table("authors")
+        ->join("authors_books", "authors_books.author_id", "=", "authors.id")
+        ->join("books", "authors_books.book_id", "=", "books.id")
+        ->where("books.id", "=", $id)
+        ->select("authors.fullname")
+        ->first();
+        $genresIncluded = DB::table("genres")
+        ->join("genres_books", "genres_books.genre_id", "=", "genres.id")
+        ->join("books", "genres_books.book_id", "=", "books.id")
+        ->where("books.id", "=", $id)
+        ->select("genres.*")
+        ->get();
+        $includedIds = $genresIncluded->map(function($element){
+            return $element->id;
+        });
+        $genresExcluded = DB::table("genres")
+        ->select("genres.*")
+        ->get();
+        $genresExcluded = $genresExcluded->filter(function($value) use ($includedIds){
+            return !in_array($value->id, $includedIds->toArray());
+        });
+        return view("adminshow", compact("book", "genresIncluded", "genresExcluded", "author"));
     }
 
     /**
@@ -152,7 +175,60 @@ class BookController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $book = Book::query()->find($id);
+        $book->name = $request->input("book-name");
+        $book->slug = $this->slugify($book->name);
+        $book->price = (float)$request->input("price");
+        $book->language = $request->input("language");
+        $book->publish_date = $request->input("date");
+        $book->description = $request->input("description");
+        $book->save();
+        if(DB::table("authors")
+        ->where("fullname", "=", $request->input("author"))
+        ->count("id") === 0){
+            $author = new Author();
+            $author->fullname = $request->input("author");
+            $author->save();
+        }
+        $authorid = DB::table("authors")
+        ->where("fullname", "=", $request->input("author"))
+        ->select("id")
+        ->first();
+        try{
+            $book->authors()->attach($authorid);
+        }
+        catch(Exception $error){}
+        foreach($request->input("genres") as $g){
+            $gid = DB::table("genres")
+            ->where("slug", "=", $g)
+            ->select("id")
+            ->first();
+            try{
+                $book->genres()->attach($gid);
+            }
+            catch(Exception $error){}
+        }
+        $images = $request->file('images');
+        $imagepaths = array();
+        if($request->hasFile("images")){
+            foreach($images as $img){
+                $prefix = date_format(now(), "YmdHis");
+                $imagename = $prefix . $img->getClientOriginalName();
+                $img->move(base_path(). "/resources/img/", $imagename);
+                $imagepaths[] = $imagename;
+            }
+        }
+        foreach($imagepaths as $imgname){
+            if(is_null(Image::query()->find($imgname))){
+                continue;
+            }
+            $img = new Image();
+            $img->id = $imgname;
+            $img->book_id = $book->id;
+            $img->alt_text = $book->name;
+            $img->save;
+        }
+        return redirect("/books/" . $book->id);
     }
 
     /**

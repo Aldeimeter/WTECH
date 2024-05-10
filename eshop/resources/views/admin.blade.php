@@ -30,7 +30,7 @@
             <input type="text" pattern="[0-9]{2}.[0-9]{2}" name="price" class="form-control" required>
             <div class="col-lg-6 col-12 mt-3">
                 <label class="form-label" for="images[]">Obrazky</label>
-                <input class="btw btn-primary" type="file" name="images[]" multiple>
+                <input accept=".jpeg,.jpg,.png" class="btw btn-primary" type="file" name="images[]" multiple>
             </div>
             <button type="submit" class="btn btn-success">Uložiť</button>
         </form>
