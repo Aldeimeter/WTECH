@@ -11,4 +11,6 @@ Auth::routes();
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 Route::get('/books/genre/{Genre}', [App\Http\Controllers\BookController::class, 'index'])->name('books.genre');
 Route::get('/search', [App\Http\Controllers\BookController::class, 'search'])->name('books.search');
+Route::resource('/cart', App\Http\Controllers\CartItemController::class);
+Route::resource('/order', App\Http\Controllers\OrderController::class);
 Route::get('/books/{id}', [App\Http\Controllers\BookController::class, 'book'])->name('books.book');

@@ -21,6 +21,7 @@ class CartItemController extends Controller
         ->join("books", "books.id", "=", "cart_items.bookid")
         ->join("authors_books", "authors_books.book_id", "=", "books.id")
         ->join("authors", "authors_books.author_id", "=", "authors.id")
+        ->where("users.id", "=", Auth::id())
         ->orderBy("books.name")
         ->select("books.*", "cart_items.amount", "authors.fullname", "cart_items.id as ciid");
         $total = $cartitems->get()->map(function ($el) {

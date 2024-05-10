@@ -12,9 +12,9 @@
                         </div>
                         <div class="card mt-5 mb-5">
                             <div class="card-body">
-                                <form>
+                                <form method="GET" action="/order/create">
                                     <label for="address" class="form-label">Adresa</label>
-                                    <input type="text" id="address" class="form-control" required>
+                                    <input name="address" type="text" id="address" class="form-control" required>
 
                                     <label for="delivery" class="form-label">Druh doručenia</label>
                                     <select name="delivery" id="delivery" class="form-select">

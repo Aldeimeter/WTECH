@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CartItem;
+use App\Models\Order;
+use App\Models\OrderItems;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -17,9 +23,39 @@ class OrderController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(Request $request)
     {
-        //
+        $cartitemstest = DB::table("users")
+        ->join("cart_items", "cart_items.userid", "=", "users.id")
+        ->where("users.id", "=", Auth::id())
+        ->count("cart_items.id");
+        if($cartitemstest < 1) {
+            return redirect("/cart");
+        }
+        $order = new Order();
+        $order->userid = Auth::id();
+        $order->address = $request->input("address");
+        $order->payment = $request->input("payment");
+        $order->delivery = $request->input("delivery");
+        $order->date = now();
+        $order->save();
+        $cart = DB::table("users")
+        ->join("cart_items", "cart_items.userid", "=", "users.id")
+        ->where("users.id", "=", Auth::id())
+        ->select("cart_items.*");
+        $cartitems = $cart->get();
+        $cartitems->each(function ($item, $key) use ($order){
+            $orderitem = new OrderItems();
+            $orderitem->bookid = $item->bookid;
+            $orderitem->orderid = $order->id;
+            $orderitem->amount = $item->amount;
+            $orderitem->save();
+            CartItem::query()->find($item->id)->delete();
+        });
+
+
+        return redirect("/");
+
     }
 
     /**
