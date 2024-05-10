@@ -19,9 +19,17 @@ class CartItemController extends Controller
         $cartitems = DB::table("users")
         ->join("cart_items", "cart_items.userid", "=", "users.id")
         ->join("books", "books.id", "=", "cart_items.bookid")
-        ->select("books.*", "cart_items.amount")->get();
+        ->join("authors_books", "authors_books.book_id", "=", "books.id")
+        ->join("authors", "authors_books.author_id", "=", "authors.id")
+        ->orderBy("books.name")
+        ->select("books.*", "cart_items.amount", "authors.fullname", "cart_items.id as ciid");
+        $total = $cartitems->get()->map(function ($el) {
+            return $el->price * $el->amount;
+        })->sum();
+        $cartitems = $cartitems->paginate(2);
 
-        return view("cart", compact("cartitems"));
+
+        return view("cart", compact("cartitems", "total"));
     }
 
     /**
@@ -64,9 +72,15 @@ class CartItemController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $idslug)
     {
-        //
+        $amount = $request->input("amount");
+        if($amount < 1){
+            $cart = CartItem::query()->find($idslug)->update(["amount" => 1]);
+            return redirect("/cart");
+        }
+        $cart = CartItem::query()->find($idslug)->update(["amount" => $amount]);
+        return redirect("/cart");
     }
 
     /**

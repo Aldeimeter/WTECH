@@ -8,4 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItems extends Model
 {
     use HasFactory;
+    protected $guarded = ["id"];
+    protected $fillable = ["bookid", "userid", "amount"];
 }
