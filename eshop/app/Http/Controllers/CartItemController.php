@@ -77,7 +77,7 @@ class CartItemController extends Controller
     {
         $amount = $request->input("amount");
         if($amount < 1){
-            $cart = CartItem::query()->find($idslug)->update(["amount" => 1]);
+            $cart = CartItem::query()->find($idslug)->delete();
             return redirect("/cart");
         }
         $cart = CartItem::query()->find($idslug)->update(["amount" => $amount]);
