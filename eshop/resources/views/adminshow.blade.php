@@ -37,7 +37,7 @@
                 @endforeach
             </select>
             <label for="date" class="form-label">Dátum vydania</label>
-            <input type="date" name="date" class="form-control" required value="{{date_format($book->publish_date, "Y-m-d")}}">
+            <input type="date" name="date" class="form-control" required value="{{$book->publish_date}}">
             <label for="price" class="form-label">Cena</label>
             <input type="text" pattern="[0-9]{2}.[0-9]{2}" name="price" class="form-control" required value="{{$book->price}}">
             <div class="col-lg-6 col-12 mt-3">
@@ -46,6 +46,7 @@
             </div>
             <button type="submit" class="btn btn-success">Uložiť</button>
             <button type="submit" class="btn btn-danger" formaction="/books/delete/{{$book->id}}">Vymazať</button>
+            <button type="submit" class="btn btn-danger" formaction="/books/deleteimages/{{$book->id}}">Vymazať obrazky</button>
         </form>
     </div>
 </main>

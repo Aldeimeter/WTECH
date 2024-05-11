@@ -2,6 +2,7 @@
 
 @section('content')
 <main class="container mt-3">
+    {{$fail}}
     <div class="row">
         <div class="col-12 col-lg-2 mb-3">
             <a href="#" role="button" class="btn btn-outline-secondary"><--- Späť</a>

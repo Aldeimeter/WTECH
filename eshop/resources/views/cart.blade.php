@@ -53,7 +53,8 @@
                         @forelse ($cartitems as $book)
                         <div class="card mb-3">
                             <div class="row">
-                                <div class="d-none d-sm-block col-3 " style="background-image: url(../img/sogun_2.jpeg); background-position-x:center;">
+                                <div class="col-3">
+                                    <img src="{{URL::asset('/img/' . $book->imageid)}}" alt="{{$book->name}}" class="d-block w-100 img-thumbnail">
                                 </div>
                                 <div class="col-9 d-flex ">
                                     <div class="card-body flex-column">

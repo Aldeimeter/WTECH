@@ -18,25 +18,28 @@ class BookController extends Controller
     public function index(Request $request, $genreSlug)
     {
         $genre = new Genre;
-        $query = Book::query();
+        $query = DB::table('books')
+        ->leftJoin("images", "books.id", "=", "images.book_id")
+        ->select("books.*", "images.id as imageid", "images.alt_text");
         if($genreSlug!='all'){
             $genre = Genre::firstWhere('slug', $genreSlug);
             $query = $genre->books();
         }
         if($request->has('price-from') && $request->input('price-from') != ''){
-            $query->where('price', '>=', $request->input('price-from'));
+            $query->where('books.price', '>=', $request->input('price-from'));
         }
         if($request->has('price-to') && $request->input('price-to') != ''){
-            $query->where('price', '<=', $request->input('price-to'));
+            $query->where('books.price', '<=', $request->input('price-to'));
         }
         if($request->has('date') && $request->input('date') != ''){
-            $query->where('date', '>=', $request->input('date'));
+            $query->where('books.date', '>=', $request->input('date'));
         }
         if($request->has('language') && $request->input('language') != 'any'){
-            $query->where('language', '=', $request->input('language'));
+            $query->where('books.language', '=', $request->input('language'));
         }
+        $query->orderBy("books.publish_date", "desc", "books.name", "desc");
         if($request->has('order') && ($request->input('order')=='asc' || $request->input('order')=='desc')){
-            $query->orderBy('price',$request->input('order'));
+            $query->orderBy('books.price',$request->input('order'));
         }
         $genre->name = 'All';
         $results = $query->paginate(2);
@@ -62,20 +65,32 @@ class BookController extends Controller
         if(is_null($amount) || $amount < 1){
             $amount = 1;
         }
-        return view("book", compact("results", "amount"));
+        $images = DB::table("images")
+        ->leftJoin("books", "images.book_id", "=", "books.id")
+        ->select("images.id", "images.alt_text")
+        ->where("books.id", "=", $idslug)
+        ->get();
+        return view("book", compact("results", "amount", "images"));
 
     }
 
-    public function admin()
+    public function admin(Request $request)
     {
         $genres = DB::table("genres")->select("slug", "name")->get();
-        return view("admin", compact("genres"));
+        $fail = "";
+        if($request->has("fail")){
+            $fail = "Také meno už existuje.";
+        }
+        return view("admin", compact("genres", "fail"));
     }
 
     public function create(Request $request)
     {
         $book = new Book();
         $book->name = $request->input("book-name");
+        if(DB::table("books")->where("name", "=", $book->name)->count() > 0){
+            return redirect("books/admin?fail=t");
+        }
         $book->slug = $this->slugify($book->name);
         $book->price = (float)$request->input("price");
         $book->language = $request->input("language");
@@ -107,19 +122,19 @@ class BookController extends Controller
             foreach($images as $img){
                 $prefix = date_format(now(), "YmdHis");
                 $imagename = $prefix . $img->getClientOriginalName();
-                $img->move(base_path(). "/resources/img/", $imagename);
+                $img->move(base_path(). "/public/img/", $imagename);
                 $imagepaths[] = $imagename;
             }
         }
         foreach($imagepaths as $imgname){
-            if(is_null(Image::query()->find($imgname))){
+            if(!is_null(Image::query()->find($imgname))){
                 continue;
             }
             $img = new Image();
             $img->id = $imgname;
             $img->book_id = $book->id;
             $img->alt_text = $book->name;
-            $img->save;
+            $img->save();
         }
         return redirect("/books/" . $book->id);
     }
@@ -135,9 +150,9 @@ class BookController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, string $id)
+    public function show(Request $request, $id)
     {
-        $book = Book::query()->find($id)->select("*")->first();
+        $book = DB::table("books")->select("*")->where('id', "=", $id)->first();
         $author = DB::table("authors")
         ->join("authors_books", "authors_books.author_id", "=", "authors.id")
         ->join("books", "authors_books.book_id", "=", "books.id")
@@ -214,19 +229,19 @@ class BookController extends Controller
             foreach($images as $img){
                 $prefix = date_format(now(), "YmdHis");
                 $imagename = $prefix . $img->getClientOriginalName();
-                $img->move(base_path(). "/resources/img/", $imagename);
+                $img->move(base_path(). "/public/img/", $imagename);
                 $imagepaths[] = $imagename;
             }
         }
         foreach($imagepaths as $imgname){
-            if(is_null(Image::query()->find($imgname))){
+            if(!is_null(Image::query()->find($imgname))){
                 continue;
             }
             $img = new Image();
             $img->id = $imgname;
             $img->book_id = $book->id;
             $img->alt_text = $book->name;
-            $img->save;
+            $img->save();
         }
         return redirect("/books/" . $book->id);
     }
@@ -248,6 +263,13 @@ class BookController extends Controller
         ->where("book_id", "=", $id)->delete();
         Book::query()->find($id)->delete();
         return redirect("/");
+    }
+
+    public function destroyImages(string $id)
+    {
+        DB::table("images")
+        ->where("book_id", "=", $id)->delete();
+        return redirect("/books/" . $id);
     }
 
     private function slugify($text) { //https://lucidar.me/en/web-dev/how-to-slugify-a-string-in-php/

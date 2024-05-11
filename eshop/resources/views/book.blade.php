@@ -14,12 +14,13 @@
                 <div class="col-12 col-lg-4">
                     <div class="carousel slide carousel-fade" data-bs-ride="carousel" id="images-carousel">
                         <div class="carousel-inner">
+                            @forelse($images as $img)
                             <div class="carousel-item active ratio ratio-1x1"">
-                     <img src=" ../img/AUD01576.webp" alt="Šógun - Audiokniha MP3 - Hlavný obrázok" class="d-block w-100 img-thumbnail">
+                     <img src="{{URL::asset('/img/' . $img->id)}}" alt="{{$img->alt_text}}" class="d-block w-100 img-thumbnail">
                             </div>
-                            <div class="carousel-item ratio ratio-1x1"">
-                     <img src=" ../img/sogun_2.jpeg" alt="" class="d-block w-100 img-thumbnail">
-                            </div>
+                            @empty
+                            <p>Nie je žiaden obrazok.</p>
+                            @endforelse
                         </div>
                         <button type="button" class="carousel-control-prev" data-bs-target="#images-carousel" data-bs-slide="prev">
                             <span class="carousel-control-prev-icon" aria-hidden="true"></span>
