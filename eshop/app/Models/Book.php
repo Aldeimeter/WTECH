@@ -76,4 +76,5 @@ class Book extends Model
     {
         return $query->where('language',$language);
     }
+
 }

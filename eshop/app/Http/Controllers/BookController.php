@@ -3,78 +3,99 @@
 namespace App\Http\Controllers;
 
 use App\Models\Author;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use App\Models\Book;
 use App\Models\Genre;
 use App\Models\Image;
 use Exception;
+use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource or search results based on query parameters.
+     * @param Request $request
+     * @param string|null $genreSlug Optional genre filter, defaults to 'all' for no genre filter.
+     * @return View|Factory
      */
-    public function index(Request $request, $genreSlug)
+    public function index(Request $request): View|Factory
     {
-        $genre = new Genre;
-        $query = DB::table('books')
-        ->leftJoin("images", "books.id", "=", "images.book_id")
-        ->select("books.*", "images.id as imageid", "images.alt_text");
-        if($genreSlug!='all'){
-            $genre = Genre::firstWhere('slug', $genreSlug);
-            $query = $genre->books();
-        }
-        if($request->has('price-from') && $request->input('price-from') != ''){
-            $query->where('books.price', '>=', $request->input('price-from'));
-        }
-        if($request->has('price-to') && $request->input('price-to') != ''){
-            $query->where('books.price', '<=', $request->input('price-to'));
-        }
-        if($request->has('date') && $request->input('date') != ''){
-            $query->where('books.date', '>=', $request->input('date'));
-        }
-        if($request->has('language') && $request->input('language') != 'any'){
-            $query->where('books.language', '=', $request->input('language'));
-        }
-        $query->orderBy("books.publish_date", "desc", "books.name", "desc");
-        if($request->has('order') && ($request->input('order')=='asc' || $request->input('order')=='desc')){
-            $query->orderBy('books.price',$request->input('order'));
-        }
-        $genre->name = 'All';
-        $results = $query->paginate(2);
-        return view('books', compact('results','genre'));
-    }
-    public function search(Request $request)
-    {
-        echo $request->search;
-        $books = Book::whereRaw("search_vector @@ plainto_tsquery('simple', ?)", [$request->search])->get();
-        echo $books;
-    }
+        $query = Book::query()->with('images'); // Using with('images') assumes that there is a relationship named 'images' in Book model
 
-    public function book(Request $request, $idslug){
-        $query = DB::table("books")
-        ->join("authors_books", "authors_books.book_id", "=", "books.id")
-        ->join("authors", "authors_books.author_id", "=", "authors.id")
-        ->join("genres_books", "books.id", "=", "genres_books.book_id")
-        ->join("genres", "genres.id", "=", "genres_books.genre_id")
-        ->select("books.*", "authors.fullname", "genres.name as genre_name")
-        ->where("books.id", "=", $idslug);
-        $results = $query->get();
-        $amount = $request->input("amount");
-        if(is_null($amount) || $amount < 1){
-            $amount = 1;
+        // Handling the search query if present
+        $searchQuery = $request->input('q');
+        if (!empty($searchQuery)) {
+            $query->whereRaw("search_vector @@ plainto_tsquery('simple', ?)", [$searchQuery]);
         }
+
+        $genreSlug = $request->input('genre', 'all');
+        // Handling genre filtering
+        if ($genreSlug !== 'all') {
+            $genre = Genre::where('slug', $genreSlug)->firstOrFail();
+            $query->whereHas('genres', function (Builder $q) use ($genre) {
+                $q->where('id', $genre->id);
+            });
+        } else {
+            $genre = new Genre(['name' => 'Všetky žánre']); // Assuming Genre model has a name field
+        }
+
+        // Additional filtering based on price, date, and language
+        if ($request->filled('price-from')) {
+            $query->where('price', '>=', $request->input('price-from'));
+        }
+        if ($request->filled('price-to')) {
+            $query->where('price', '<=', $request->input('price-to'));
+        }
+        if ($request->filled('date')) {
+            $query->where('publish_date', '>=', $request->input('date'));
+        }
+        if ($request->filled('language') && $request->input('language') !== 'any') {
+            $query->where('language', $request->input('language'));
+        }
+
+        // Ordering
+        if ($request->filled('order') && in_array($request->input('order'), ['asc', 'desc'])) {
+            $query->orderBy('price', $request->input('order'));
+        } else {
+            $query->orderBy('publish_date', 'desc');
+        }
+
+        // Pagination of results
+        $results = $query->paginate(5);
+
+        // Return the view with all necessary data
+        return view('books', compact('results', 'genre', 'searchQuery'));
+    }
+    /**
+     * @return View|Factory
+     * @param mixed $idslug
+     */
+    public function book(Request $request, $idslug): View|Factory{
+        $book = Book::with(['authors', 'genres'])
+                ->where('id', $idslug)
+                ->firstOrFail();
+
+        $amount = $request->input('amount', 1);
+        $amount = max(1, (int) $amount); // Ensure amount is at least 1
+
         $images = DB::table("images")
         ->leftJoin("books", "images.book_id", "=", "books.id")
         ->select("images.id", "images.alt_text")
         ->where("books.id", "=", $idslug)
         ->get();
-        return view("book", compact("results", "amount", "images"));
+
+        return view("book", compact("book", "amount", "images"));
 
     }
-
-    public function admin(Request $request)
+    /**
+     * @return View|Factory
+     */
+    public function admin(Request $request): View|Factory
     {
         $genres = DB::table("genres")->select("slug", "name")->get();
         $fail = "";
@@ -83,8 +104,10 @@ class BookController extends Controller
         }
         return view("admin", compact("genres", "fail"));
     }
-
-    public function create(Request $request)
+    /**
+     * @return Redirector|RedirectResponse
+     */
+    public function create(Request $request): Redirector|RedirectResponse
     {
         $book = new Book();
         $book->name = $request->input("book-name");
@@ -141,16 +164,19 @@ class BookController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * @return void
      */
-    public function store(Request $request)
+    public function store(Request $request): void
     {
         //
     }
 
     /**
      * Display the specified resource.
+     * @return View|Factory
+     * @param mixed $id
      */
-    public function show(Request $request, $id)
+    public function show(Request $request, $id): View|Factory
     {
         $book = DB::table("books")->select("*")->where('id', "=", $id)->first();
         $author = DB::table("authors")
@@ -179,16 +205,18 @@ class BookController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     * @return void
      */
-    public function edit(string $id)
+    public function edit(string $id): void
     {
         //
     }
 
     /**
      * Update the specified resource in storage.
+     * @return Redirector|RedirectResponse
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $id): Redirector|RedirectResponse
     {
         $book = Book::query()->find($id);
         $book->name = $request->input("book-name");
@@ -248,8 +276,9 @@ class BookController extends Controller
 
     /**
      * Remove the specified resource from storage.
+     * @return Redirector|RedirectResponse
      */
-    public function destroy(string $id)
+    public function destroy(string $id): Redirector|RedirectResponse
     {
         DB::table("cart_items")
         ->where("bookid", "=", $id)->delete();
@@ -264,15 +293,20 @@ class BookController extends Controller
         Book::query()->find($id)->delete();
         return redirect("/");
     }
-
-    public function destroyImages(string $id)
+    /**
+     * @return Redirector|RedirectResponse
+     */
+    public function destroyImages(string $id): Redirector|RedirectResponse
     {
         DB::table("images")
         ->where("book_id", "=", $id)->delete();
         return redirect("/books/" . $id);
     }
-
-    private function slugify($text) { //https://lucidar.me/en/web-dev/how-to-slugify-a-string-in-php/
+    /**
+     * @return string
+     * @param mixed $text
+     */
+    private function slugify($text): string { //https://lucidar.me/en/web-dev/how-to-slugify-a-string-in-php/
         // Strip html tags
         $text=strip_tags($text);
         // Replace non letter or digits by -

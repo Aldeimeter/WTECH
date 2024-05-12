@@ -4,11 +4,12 @@
 <main class="container mt-3">
     <div class="row">
         <div class="col-12 col-lg-2 mb-3">
-            <a href="#" role="button" class="btn btn-outline-secondary"><--- Späť</a>
+            <a href="{{ url()->previous() }}" role="button" class="btn btn-outline-secondary"><--- Späť</a>
         </div>
     </div>
     <div class="card">
-        <h3 class="card-header">{{$results[0]->name}}</h3>
+        @if(!empty($book))
+        <h3 class="card-header">{{$book->name}}</h3>
         <div class="card-body">
             <div class="row">
                 <div class="col-12 col-lg-4">
@@ -36,25 +37,25 @@
                     <div class="row border rounded-5 p-3 mt-3 mt-lg-0">
                         <div class="col-12">
                             <h5>Opis</h5>
-                            <p>{{$results[0]->description}}</p>
+                            <p>{{$book->description}}</p>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
-                            <span>Cena: {{$results[0]->price}}$</span>
+                            <span>Cena: {{$book->price}}$</span>
                             <div class="input-group">
                                 @if($amount > 1)
-                                <a id="decrement" class="btn" href="{{route('books.book', ['id' => $results[0]->id, 'amount' => ($amount - 1)])}}">-</a>
+                                <a id="decrement" class="btn" href="{{route('books.book', ['id' => $book->id, 'amount' => ($amount - 1)])}}">-</a>
                                 @else
                                 <a id="decrement" class="btn" href="">-</a>
                                 @endif
                                 <input type="number" id="input" value="{{$amount}}" class="form-control" readonly>
-                                <a id="increment" class="btn" href="{{route('books.book', ['id' => $results[0]->id, 'amount' => ($amount + 1)])}}">+</a>
+                                <a id="increment" class="btn" href="{{route('books.book', ['id' => $book->id, 'amount' => ($amount + 1)])}}">+</a>
                             </div>
                         </div>
                         <div class="col-12 col-md-6 mt-3 text-center fs-3">
-                            <span id="sum">Suma: {{$results[0]->price * $amount}}$</span><br>
+                            <span id="sum">Suma: {{$book->price * $amount}}$</span><br>
                             @if(Auth::check())
-                            <a href="{{ route('cart.create', ['bookid' => $results[0]->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-success">Kupit</a>
-                            <a href="{{ route('cart.create', ['bookid' => $results[0]->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
+                            <a href="{{ route('cart.create', ['bookid' => $book->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-success">Kupit</a>
+                            <a href="{{ route('cart.create', ['bookid' => $book->id, 'amount' => $amount]) }}" role="button" class="btn btn-lg btn-outline-success">Pridat do košíka</a>
                             @else
                             <a href="#" role="button" class="btn btn-lg btn-secondary">Kupit</a>
                             <a href="#" role="button" class="btn btn-lg btn-outline-secondary">Pridat do košíka</a>
@@ -66,15 +67,29 @@
         </div>
         <div class="card-footer row mx-0">
             <div class="col-4">
-                Autor: {{$results[0]->fullname}}
+                Autor:
+                @forelse($book->authors as $author)
+                <span class="badge bg-secondary">{{$author->fullname}}</span>
+                @empty
+                <span class="badge bg-secondary">Anonymný</span>
+                @endforelse
             </div>
             <div class="col-4">
-                Jazyk: {{$results[0]->language}}
+                Jazyk:
+                <span class="badge bg-secondary">{{$book->language == 'SVK' ? 'Slovensky' : 'Anglicky'}}</span>
             </div>
             <div class="col-4">
-                Žánre: {{$results[0]->genre_name}}
+                Žánre:
+                @forelse($book->genres as $genre)
+                <span class="badge bg-secondary">{{$genre->name}}</span>
+                @empty
+                <span class="badge bg-secondary">Žiadne žánre</span>
+                @endforelse
             </div>
         </div>
+        @else
+        <h3 class="card-header">Kniha nebola nájdená</h3>
+        @endif
     </div>
 </main>
 

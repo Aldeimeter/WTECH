@@ -7,7 +7,7 @@
         <div class="col-12 col-lg-2 mb-3">
             <a href="#" role="button" class="btn btn-outline-secondary"><--- Späť</a>
         </div>
-        <form method="POST" enctype="multipart/form-data" action="/books/create" class="col-12 col-lg-8 fs-3">
+        <form method="POST" enctype="multipart/form-data" action="/admin/books/create" class="col-12 col-lg-8 fs-3">
             {{ csrf_field() }}
             <label for="book-name" class="form-label">Nazov</label>
             <input type="text" name="book-name" class="form-control" required>

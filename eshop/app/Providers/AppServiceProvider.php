@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        View::composer('layouts.partials.genresMenu', function($view) {
+        View::composer('books', function($view) {
             $view->with('genres', Genre::all());
         });
     }
