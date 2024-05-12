@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Genre;
+use App\Models\User;
 use App\Models\Book;
 use Illuminate\Support\Str;
 class DatabaseSeeder extends Seeder
@@ -14,6 +15,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        User::create([
+           'email' => 'admin@admin.com',
+           'password' => bcrypt('secretpass'),
+           'is_admin' => true,
+                ]);
         $genres = [
             'Crime','Fantasy','Horror','Non-Fiction','Fiction'
         ];
