@@ -55,10 +55,10 @@
             <div class="card">
                 <div class="row g-0 my-3 mb-md-2 mt-md-0">
                     <div class="col-md-4">
-                        <!-- Image placeholder or dynamic image -->
+                        <img src="{{URL::asset('/img/' . $book->imageid)}}" alt="{{$book->name}}" class="d-block w-100 img-thumbnail">
                     </div>
                     <div class="col-md-8">
-                        <h5 class="card-header">{{ $book->name }}</h5>
+                        <h5 class="card-header"><a href="/books/{{$book->id}}">{{ $book->name }}</a></h5>
                         <div class="card-body">
                             <div class="row">
                                 <div class="col-md-8">

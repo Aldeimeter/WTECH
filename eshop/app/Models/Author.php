@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Author extends Model
 {
+    /**
      * The attributes that are mass assignable.
      *
      * @var array<int, string>

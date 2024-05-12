@@ -13,7 +13,13 @@ class Image extends Model
      */
     protected $fillable = [
         'alt_text',
+        'id',
+        'book_id',
     ];
+
+    protected $primaryKey = 'id';
+    protected $keyType = "string";
+    public $incrementing = false;
 
     public function book(): BelongsTo
     {

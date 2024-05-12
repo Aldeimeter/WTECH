@@ -13,8 +13,11 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
+                    @if(Auth::check())
                     {{ __('You are logged in!') }}
+                    @else
+                    {{ __('You are NOT logged in') }}
+                    @endif
                 </div>
             </div>
         </div>
