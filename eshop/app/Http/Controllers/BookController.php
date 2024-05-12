@@ -18,13 +18,14 @@ class BookController extends Controller
     public function index(Request $request, $genreSlug)
     {
         $genre = new Genre;
-        $query = DB::table('books')
-        ->leftJoin("images", "books.id", "=", "images.book_id")
-        ->select("books.*", "images.id as imageid", "images.alt_text");
+        $query = DB::table('books');
         if($genreSlug!='all'){
             $genre = Genre::firstWhere('slug', $genreSlug);
             $query = $genre->books();
         }
+        $query = $query
+        ->leftJoin("images", "books.id", "=", "images.book_id")
+        ->select("books.*", "images.id as imageid", "images.alt_text");
         if($request->has('price-from') && $request->input('price-from') != ''){
             $query->where('books.price', '>=', $request->input('price-from'));
         }
