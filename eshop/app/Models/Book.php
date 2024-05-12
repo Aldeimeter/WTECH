@@ -7,18 +7,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class Book extends Model
 {
-      protected static function booted()
+      protected static function booted(): void
         {
             static::saved(function ($book) {
                 // Update the search_vector manually
                 $book->updateSearchVector();
             });
         }
-
-        public function updateSearchVector()
+    /**
+     * @return void
+     */
+    public function updateSearchVector(): void
         {
             DB::table('books')
                 ->where('id', $this->id)
@@ -51,7 +54,7 @@ class Book extends Model
         'publish_date' => 'datetime',
     ];
 
-    public function getRouteKeyName()
+    public function getRouteKeyName(): string
     {
         return 'slug';
     }
@@ -71,7 +74,10 @@ class Book extends Model
     {
         return $this->hasMany(Image::class);
     }
-
+    /**
+     * @param mixed $query
+     * @param mixed $language
+     */
     public function scopeOfLanguage($query, $language)
     {
         return $query->where('language',$language);

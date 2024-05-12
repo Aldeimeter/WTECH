@@ -6,7 +6,7 @@
         <div class="col-12 col-lg-2 mb-3">
             <a href="#" role="button" class="btn btn-outline-secondary"><--- Späť</a>
         </div>
-        <form method="POST" enctype="multipart/form-data" action="/books/update/{{$book->id}}" class="col-12 col-lg-8 fs-3">
+        <form method="POST" enctype="multipart/form-data" action="/admin/books/update/{{$book->id}}" class="col-12 col-lg-8 fs-3">
             {{ csrf_field() }}
             {{method_field("PUT")}}
             <label for="book-name" class="form-label">Nazov</label>
@@ -14,7 +14,7 @@
             <label for="description" class="form-label">Opis</label>
             <textarea name="description" class="form-control" style="height:200px" required>{{$book->description}}</textarea>
             <label for="author" class="form-label">Autor</label>
-            <input type="text" name="author" class="form-control" required value="{{$author->fullname}}">
+            <input type="text" name="author" class="form-control" required value="{{$author != null ? $author->fullname : 'Anonimny'}}">
             <label for="language" class="form-label">Jazyk</label>
             <select name="language" class="form-select" aria-label="language-choose" required>
                 <option value="SVK"

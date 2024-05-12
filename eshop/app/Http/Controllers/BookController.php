@@ -178,28 +178,14 @@ class BookController extends Controller
      */
     public function show(Request $request, $id): View|Factory
     {
-        $book = DB::table("books")->select("*")->where('id', "=", $id)->first();
-        $author = DB::table("authors")
-        ->join("authors_books", "authors_books.author_id", "=", "authors.id")
-        ->join("books", "authors_books.book_id", "=", "books.id")
-        ->where("books.id", "=", $id)
-        ->select("authors.fullname")
-        ->first();
-        $genresIncluded = DB::table("genres")
-        ->join("genres_books", "genres_books.genre_id", "=", "genres.id")
-        ->join("books", "genres_books.book_id", "=", "books.id")
-        ->where("books.id", "=", $id)
-        ->select("genres.*")
-        ->get();
+        $book = Book::with(['authors', 'genres']) ->where('id', $id) ->firstOrFail();
+        $genresIncluded = $book->genres;
+        $author = $book->authors->first();
+
         $includedIds = $genresIncluded->map(function($element){
             return $element->id;
         });
-        $genresExcluded = DB::table("genres")
-        ->select("genres.*")
-        ->get();
-        $genresExcluded = $genresExcluded->filter(function($value) use ($includedIds){
-            return !in_array($value->id, $includedIds->toArray());
-        });
+        $genresExcluded = Genre::whereNotIn('id', $includedIds)->get();
         return view("adminshow", compact("book", "genresIncluded", "genresExcluded", "author"));
     }
 

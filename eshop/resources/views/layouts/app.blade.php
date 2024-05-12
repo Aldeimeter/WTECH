@@ -27,6 +27,7 @@
             <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav me-auto">
                     <a class="nav-link " href="{{ route('books.search') }}"><h5>Knihy</h5></a>
+                    <a class="nav-link " href="{{ route('books.admin') }}"><h5>Pridať knihu</h5></a>
                 </ul>
 
                     <!-- Right Side Of Navbar -->

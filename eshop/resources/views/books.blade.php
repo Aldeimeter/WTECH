@@ -85,6 +85,11 @@
                                     <p class="text-wrap">{{ $book->description }}</p>
                                     <span>{{ $book->price  }} $</span>
                                 </div>
+                                 @if(auth()->check() && auth()->user()->is_admin)
+                                    <div>
+                                        <a href="{{ route('books.show', ['id' => $book->id]) }} " role="button" class="btn btn-lg btn-outline-primary">Odstrániť/Aktualizovať</a>
+                                    </div>
+                                @endif
                                 <div class="col-md-4">
                                     <span>{{ $book->language == 'SVK' ? 'Slovensky' : 'Anglicky' }}</span>
                                 </div>
